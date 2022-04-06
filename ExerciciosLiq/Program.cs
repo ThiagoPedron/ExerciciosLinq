@@ -85,18 +85,18 @@ static class Pesquisador
                 {
                     ID = x.ID,
                     ProfessorID = x.ProfessorID
-                }).Join(uni.Professores,t => t.ProfessorID,y=>y.ID,(t,y) => new
+                }).Join(uni.Professores, t => t.ProfessorID, y => y.ID, (t, y) => new
                 {
                     NomeProfessor = y.Nome
                 })
             });
         foreach (var item in result)
         {
-            Console.WriteLine(item.Nome.Split(" ").First() + " " + item.Idade+"\n");
+            Console.WriteLine(item.Nome.Split(" ").First() + " " + item.Idade + "\n");
             Console.WriteLine("\tPROFESSORES\n");
-            foreach(var turma in item.Turma)
+            foreach (var turma in item.Turma)
             {
-                Console.WriteLine("\t\t"+turma.NomeProfessor);
+                Console.WriteLine("\t\t" + turma.NomeProfessor);
             }
         }
 
@@ -117,18 +117,25 @@ static class Pesquisador
         Console.WriteLine("Professor\tQtd Alunos\n");
         foreach (var item in result)
         {
-            Console.WriteLine(item.First().Nome.Split(" ").First() +" \t\t "+ item.First().QtdAlunos);
+            Console.WriteLine(item.First().Nome.Split(" ").First() + " \t\t " + item.First().QtdAlunos);
         }
 
 
     }
 
-    /// <summary>
-    /// Top 10 Professores com mais alunos da universidade
-    /// </summary>
     public static void Pesquisa4(this Universidade uni)
     {
-        WriteLine("Não implementado!");
+        var result = uni.Professores.Join(uni.Turmas, x => x.ID, t => t.ProfessorID, (x, t) => new
+        {
+            Nome = x.Nome,
+            QtdAlunos = uni.Alunos.Count(y => y.TurmasMatriculados.Contains(t.ID))
+        }).OrderByDescending(x => x.QtdAlunos).GroupBy(x => x.Nome).Take(10);
+
+        Console.WriteLine("Professor\tQtd Alunos\n");
+        foreach (var item in result)
+        {
+            Console.WriteLine(item.First().Nome.Split(" ").First() + " \t\t " + item.First().QtdAlunos);
+        }
     }
 
     /// <summary>
@@ -137,7 +144,24 @@ static class Pesquisador
     /// </summary>
     public static void Pesquisa5(this Universidade uni)
     {
-        WriteLine("Não implementado!");
+        var result = uni.Alunos
+            .Select(x => new
+            {
+              Nome =   x.Nome,
+              Turmas = x.TurmasMatriculados,
+            });
+
+        foreach (var item in result)
+        {
+            Console.Write(item.Nome + " \t\t ");
+           foreach (var t in item.Turmas)
+            {
+                Console.Write( t + ",");
+            }
+            
+           WriteLine();
+        }
+
     }
 }
 
@@ -256,11 +280,11 @@ public class Universidade
             Nome = "Jordão Vyctor", Idade = 22},
         new Aluno() { ID = 7, TurmasMatriculados = new List<int>() { 1, 8, 15, 7, 13, 3, 11, 4 },
             Nome = "Alan Jun Onoda", Idade = 18},
-        new Aluno() { ID = 7, TurmasMatriculados = new List<int>() {4, 13, 5, 6 , 17, 11, 13, 9 },
+        new Aluno() { ID = 8, TurmasMatriculados = new List<int>() {4, 13, 5, 6 , 17, 11, 13, 9 },
             Nome = "Wagber", Idade = 19},
-        new Aluno() { ID = 7, TurmasMatriculados = new List<int>() { 3, 2, 1, 17, 5, 4, 6, 7, 8, 14 },
+        new Aluno() { ID = 9, TurmasMatriculados = new List<int>() { 3, 2, 1, 17, 5, 4, 6, 7, 8, 14 },
             Nome = "Vitor Corra", Idade = 18},
-        new Aluno() { ID = 7, TurmasMatriculados = Enumerable.Range(1, 12).ToList(),
+        new Aluno() { ID = 10, TurmasMatriculados = Enumerable.Range(1, 12).ToList(),
             Nome = "Gabriel Maia", Idade = 18}
     };
 }
