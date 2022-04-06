@@ -147,29 +147,32 @@ static class Pesquisador
         var result = uni.Alunos
             .Select(x => new
             {
-              Nome =   x.Nome,
-              Turmas = x.TurmasMatriculados.Join(uni.Turmas, t => t, x => x.ID, (t, x) => new
-              {
-                  ID = x.ID,
-                  ProfessorID = x.ProfessorID,
-                  QtdAlunos = uni.Alunos.Count(y => y.TurmasMatriculados.Contains(x.ID))
-              }).Join(uni.Professores, a => a.ProfessorID, y => y.ID, (a, y) => new
-              {
-                  NomeProfessor = y.Nome,
-                  SalarioProfessor = y.Salario,
-              })
+                Nome = x.Nome,
+                Turmas = x.TurmasMatriculados.Join(uni.Turmas, t => t, x => x.ID, (t, x) => new
+                {
+                    IDTurma = x.ID,
+                    ProfessorID = x.ProfessorID,
+                    QtdAlunos = uni.Alunos.Count(y => y.TurmasMatriculados.Contains(x.ID))
+                }).Join(uni.Professores, a => a.ProfessorID, y => y.ID, (a, y) => new
+                {
+                    qtd = a.QtdAlunos,
+                    NomeProfessor = y.Nome,
+                    SalarioProfessor = y.Salario,
+                }).Select(x => new
+                {
+                    CustoTotal = (x.SalarioProfessor / x.qtd)
+                })
+            }).Select(x => new
+            {
+                NomeAluno = x.Nome,
+                CustoTotal = 300 + x.Turmas.Sum(y => y.CustoTotal),
             });
 
         foreach (var item in result)
         {
-            Console.WriteLine(item.Nome + " \t ");
-           foreach (var t in item.Turmas)
-            {
-                Console.WriteLine("\t" + t.NomeProfessor.Split(" ").First()+ " " + t.SalarioProfessor);
-            }
-            
-           WriteLine();
+            Console.WriteLine("Nome   : {0}\nCusto  : {1}\n", item.NomeAluno.Split(" ").First(),item.CustoTotal.ToString("R$ 00.00"));
         }
+
 
     }
 }
