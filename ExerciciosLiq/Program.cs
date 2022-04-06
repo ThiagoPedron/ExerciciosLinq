@@ -148,15 +148,24 @@ static class Pesquisador
             .Select(x => new
             {
               Nome =   x.Nome,
-              Turmas = x.TurmasMatriculados,
+              Turmas = x.TurmasMatriculados.Join(uni.Turmas, t => t, x => x.ID, (t, x) => new
+              {
+                  ID = x.ID,
+                  ProfessorID = x.ProfessorID,
+                  QtdAlunos = uni.Alunos.Count(y => y.TurmasMatriculados.Contains(x.ID))
+              }).Join(uni.Professores, a => a.ProfessorID, y => y.ID, (a, y) => new
+              {
+                  NomeProfessor = y.Nome,
+                  SalarioProfessor = y.Salario,
+              })
             });
 
         foreach (var item in result)
         {
-            Console.Write(item.Nome + " \t\t ");
+            Console.WriteLine(item.Nome + " \t ");
            foreach (var t in item.Turmas)
             {
-                Console.Write( t + ",");
+                Console.WriteLine("\t" + t.NomeProfessor.Split(" ").First()+ " " + t.SalarioProfessor);
             }
             
            WriteLine();
